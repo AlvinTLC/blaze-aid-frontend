@@ -23,4 +23,22 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy vendor libs into their own cacheable chunks
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts') || id.includes('/d3-') || id.includes('victory')) {
+              return 'recharts'
+            }
+            if (id.includes('framer-motion') || id.includes('/motion-')) {
+              return 'motion'
+            }
+          }
+          return undefined
+        },
+      },
+    },
+  },
 })

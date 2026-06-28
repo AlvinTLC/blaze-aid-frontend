@@ -10,6 +10,9 @@ import {
 } from 'lucide-react'
 
 import { statsQuery } from '@/api/queries'
+import { AnimatedCounter } from '@/components/animated-counter'
+import { RecentFeed } from '@/components/recent-feed'
+import { TimelineChart } from '@/components/timeline-chart'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,6 +24,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatNumber } from '@/lib/format'
+import { computeRegionTotals, flattenRecent } from '@/lib/stats'
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
@@ -61,18 +65,8 @@ function DashboardPage() {
   const { data, isLoading, isError, error } = useQuery(statsQuery)
 
   const counts = data?.counts ?? {}
-  const regions = Object.entries(data?.by_region ?? {})
-    .map(([region, entities]) => ({
-      region,
-      total: Object.values(entities ?? {}).reduce(
-        (sum, value) => sum + (value ?? 0),
-        0,
-      ),
-    }))
-    .filter((row) => row.total > 0)
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 8)
-
+  const regions = computeRegionTotals(data?.by_region)
+  const recent = flattenRecent(data?.recent)
   const maxRegionTotal = regions[0]?.total ?? 1
 
   return (
@@ -124,7 +118,7 @@ function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {COUNT_CARDS.map((card) => {
             const Icon = card.icon
-            const value = counts[card.key]
+            const value = counts[card.key] ?? 0
             return (
               <Card key={card.key} className="gap-0 py-5">
                 <CardHeader className="pb-2">
@@ -139,9 +133,10 @@ function DashboardPage() {
                   ) : isLoading ? (
                     <Skeleton className="h-9 w-20" />
                   ) : (
-                    <span className="font-mono text-3xl font-semibold tabular-nums tracking-tight">
-                      {formatNumber(value)}
-                    </span>
+                    <AnimatedCounter
+                      value={value}
+                      className="font-mono text-3xl font-semibold tabular-nums tracking-tight"
+                    />
                   )}
                   <Button
                     variant="ghost"
@@ -162,13 +157,44 @@ function DashboardPage() {
 
         {isError && (
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            <AlertTriangle className="size-4" />
+            <AlertTriangle className="size-4 shrink-0" />
             No pudimos conectar con el servicio de datos.
-            <span className="text-muted-foreground">
+            <span className="hidden text-muted-foreground sm:inline">
               {String((error as Error)?.message ?? '')}
             </span>
           </div>
         )}
+      </section>
+
+      {/* activity: timeline + recent feed */}
+      <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Actividad reciente</CardTitle>
+              <CardDescription>
+                Eventos registrados en los últimos días.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-64 w-full" />
+              ) : (
+                <TimelineChart timeline={data?.timeline} />
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Últimas novedades</CardTitle>
+              <CardDescription>Lo que acaba de llegar.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RecentFeed entries={recent} isLoading={isLoading} />
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
       {/* regions */}
@@ -177,8 +203,8 @@ function DashboardPage() {
           <CardHeader>
             <CardTitle>Actividad por estado</CardTitle>
             <CardDescription>
-              Volumen de registros agrupados por región. El mapa interactivo
-              llegará en la próxima fase.
+              Volumen total de registros agrupados por región. El mapa 3D
+              interactivo llega en el próximo commit.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -204,7 +230,7 @@ function DashboardPage() {
                     </span>
                     <div className="relative h-6 flex-1 overflow-hidden rounded-md bg-muted">
                       <div
-                        className="h-full rounded-md bg-gradient-to-r from-blaze to-blaze-gold transition-all"
+                        className="h-full rounded-md bg-gradient-to-r from-blaze to-blaze-gold transition-[width] duration-700 ease-out"
                         style={{
                           width: `${Math.max(6, (row.total / maxRegionTotal) * 100)}%`,
                         }}
