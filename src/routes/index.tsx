@@ -11,6 +11,7 @@ import {
 
 import { statsQuery } from '@/api/queries'
 import { AnimatedCounter } from '@/components/animated-counter'
+import { Hero3D } from '@/components/hero/hero3d'
 import { RecentFeed } from '@/components/recent-feed'
 import { TimelineChart } from '@/components/timeline-chart'
 import { VenezuelaMap } from '@/components/venezuela-map'
@@ -73,10 +74,11 @@ function DashboardPage() {
       {/* ambient backdrop */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] overflow-hidden"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] overflow-hidden"
       >
         <div className="absolute left-1/2 top-[-10rem] h-[32rem] w-[64rem] -translate-x-1/2 rounded-full bg-blaze/20 blur-[120px] dark:bg-blaze/10" />
         <div className="absolute left-1/4 top-[-6rem] h-[20rem] w-[40rem] -translate-x-1/2 rounded-full bg-blaze-blue/20 blur-[120px] dark:bg-blaze-blue/10" />
+        <Hero3D />
       </div>
 
       {/* hero */}
