@@ -13,6 +13,7 @@ import { statsQuery } from '@/api/queries'
 import { AnimatedCounter } from '@/components/animated-counter'
 import { RecentFeed } from '@/components/recent-feed'
 import { TimelineChart } from '@/components/timeline-chart'
+import { VenezuelaMap } from '@/components/venezuela-map'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,7 +24,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatNumber } from '@/lib/format'
 import { computeRegionTotals, flattenRecent } from '@/lib/stats'
 
 export const Route = createFileRoute('/')({
@@ -67,7 +67,6 @@ function DashboardPage() {
   const counts = data?.counts ?? {}
   const regions = computeRegionTotals(data?.by_region)
   const recent = flattenRecent(data?.recent)
-  const maxRegionTotal = regions[0]?.total ?? 1
 
   return (
     <div className="relative">
@@ -203,45 +202,19 @@ function DashboardPage() {
           <CardHeader>
             <CardTitle>Actividad por estado</CardTitle>
             <CardDescription>
-              Volumen total de registros agrupados por región. El mapa 3D
-              interactivo llega en el próximo commit.
+              Mapa interactivo de Venezuela. Pasa el cursor o haz clic en un
+              estado para ver su volumen de registros.
             </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="h-9 w-full" />
-                ))}
-              </div>
+              <Skeleton className="h-72 w-full" />
             ) : regions.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">
                 Aún no hay datos regionales para mostrar.
               </p>
             ) : (
-              <ul className="space-y-2.5">
-                {regions.map((row) => (
-                  <li
-                    key={row.region}
-                    className="flex items-center gap-3 text-sm"
-                  >
-                    <span className="w-40 shrink-0 truncate font-medium">
-                      {row.region}
-                    </span>
-                    <div className="relative h-6 flex-1 overflow-hidden rounded-md bg-muted">
-                      <div
-                        className="h-full rounded-md bg-gradient-to-r from-blaze to-blaze-gold transition-[width] duration-700 ease-out"
-                        style={{
-                          width: `${Math.max(6, (row.total / maxRegionTotal) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                    <span className="w-12 shrink-0 text-right font-mono tabular-nums text-muted-foreground">
-                      {formatNumber(row.total)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <VenezuelaMap regions={regions} />
             )}
           </CardContent>
         </Card>

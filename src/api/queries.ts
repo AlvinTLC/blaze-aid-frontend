@@ -1,6 +1,7 @@
 import { queryOptions, keepPreviousData } from '@tanstack/react-query'
 import { apiClient } from './client'
 import type { operations } from './schema'
+import type { GeoCollection } from '@/lib/geo'
 
 /* ------------------------------------------------------------------ */
 /* Dashboard stats                                                     */
@@ -78,3 +79,20 @@ export function missingQuery(query: QueryOf<'list-missing'>) {
     placeholderData: keepPreviousData,
   })
 }
+
+/* ------------------------------------------------------------------ */
+/* Static Venezuela states GeoJSON (bundled in /public)               */
+/* ------------------------------------------------------------------ */
+
+export const venezuelaGeoQuery = queryOptions({
+  queryKey: ['venezuela-geo'] as const,
+  queryFn: async () => {
+    const res = await fetch('/venezuela-states.geo.json')
+    if (!res.ok) {
+      throw new Error('No se pudo cargar el mapa de Venezuela')
+    }
+    return (await res.json()) as GeoCollection
+  },
+  staleTime: Infinity,
+  gcTime: Infinity,
+})
