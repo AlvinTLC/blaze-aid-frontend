@@ -11,11 +11,9 @@ import {
 
 import { statsQuery } from '@/api/queries'
 import { AnimatedCounter } from '@/components/animated-counter'
-import { Hero3D } from '@/components/hero/hero3d'
+import { MapHero3D } from '@/components/hero/map-hero-3d'
 import { RecentFeed } from '@/components/recent-feed'
 import { TimelineChart } from '@/components/timeline-chart'
-import { VenezuelaMap } from '@/components/venezuela-map'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -71,48 +69,8 @@ function DashboardPage() {
 
   return (
     <div className="relative">
-      {/* ambient backdrop */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] overflow-hidden"
-      >
-        <div className="absolute left-1/2 top-[-10rem] h-[32rem] w-[64rem] -translate-x-1/2 rounded-full bg-blaze/20 blur-[120px] dark:bg-blaze/10" />
-        <div className="absolute left-1/4 top-[-6rem] h-[20rem] w-[40rem] -translate-x-1/2 rounded-full bg-blaze-blue/20 blur-[120px] dark:bg-blaze-blue/10" />
-        <Hero3D />
-      </div>
-
-      {/* hero */}
-      <section className="mx-auto max-w-7xl px-4 pb-6 pt-16 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
-        <div className="mx-auto max-w-3xl text-center">
-          <Badge variant="outline" className="mb-5 gap-1.5">
-            <span className="size-1.5 animate-pulse rounded-full bg-blaze" />
-            Datos en vivo · Venezuela
-          </Badge>
-          <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-            Ayuda humanitaria,
-            <br />
-            <span className="bg-gradient-to-r from-blaze via-blaze-gold to-blaze-blue bg-clip-text text-transparent">
-              cuando más se necesita
-            </span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-            Un punto único para encontrar proyectos de ayuda, recursos,
-            personas desaparecidas y voluntarios — organizados por estado en
-            toda Venezuela.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" asChild>
-              <Link to="/missing">
-                Buscar desaparecidos
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/projects">Ver proyectos</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* hero: interactive 3D Venezuela map */}
+      <MapHero3D regions={regions} isLoading={isLoading} />
 
       {/* counts */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -196,30 +154,6 @@ function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-      </section>
-
-      {/* regions */}
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Actividad por estado</CardTitle>
-            <CardDescription>
-              Mapa interactivo de Venezuela. Pasa el cursor o haz clic en un
-              estado para ver su volumen de registros.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-72 w-full" />
-            ) : regions.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                Aún no hay datos regionales para mostrar.
-              </p>
-            ) : (
-              <VenezuelaMap regions={regions} />
-            )}
-          </CardContent>
-        </Card>
       </section>
     </div>
   )

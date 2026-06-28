@@ -114,3 +114,28 @@ export function computeBounds(features: GeoFeature[]): GeoBounds {
     height: maxLat - minLat,
   }
 }
+
+/** Polygon = array of rings (first = outer, rest = holes). */
+export type Polygon = Ring[]
+
+/** Extract an array of polygons (handles Polygon and MultiPolygon). */
+export function toPolygons(geometry: GeoFeature['geometry']): Polygon[] {
+  if (geometry.type === 'Polygon') {
+    return [geometry.coordinates as Ring[]]
+  }
+  return geometry.coordinates as Ring[][]
+}
+
+/**
+ * Decimate a ring to at most `maxPoints` vertices (keeps shape).
+ * Keeps first point; skips by a computed step. Avoids huge geometries.
+ */
+export function decimate(ring: Ring, maxPoints = 220): Ring {
+  if (ring.length <= maxPoints) return ring
+  const step = Math.ceil(ring.length / maxPoints)
+  const out: Ring = []
+  for (let i = 0; i < ring.length; i += step) out.push(ring[i])
+  // ensure closure
+  if (out[out.length - 1] !== ring[ring.length - 1]) out.push(ring[ring.length - 1])
+  return out
+}
