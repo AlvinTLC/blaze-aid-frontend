@@ -14,6 +14,10 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as MissingRouteImport } from './routes/missing'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VolunteersIdRouteImport } from './routes/volunteers.$id'
+import { Route as ResourcesIdRouteImport } from './routes/resources.$id'
+import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
+import { Route as MissingIdRouteImport } from './routes/missing.$id'
 
 const VolunteersRoute = VolunteersRouteImport.update({
   id: '/volunteers',
@@ -40,43 +44,103 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VolunteersIdRoute = VolunteersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => VolunteersRoute,
+} as any)
+const ResourcesIdRoute = ResourcesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ResourcesRoute,
+} as any)
+const ProjectsIdRoute = ProjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProjectsRoute,
+} as any)
+const MissingIdRoute = MissingIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => MissingRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/missing': typeof MissingRoute
-  '/projects': typeof ProjectsRoute
-  '/resources': typeof ResourcesRoute
-  '/volunteers': typeof VolunteersRoute
+  '/missing': typeof MissingRouteWithChildren
+  '/projects': typeof ProjectsRouteWithChildren
+  '/resources': typeof ResourcesRouteWithChildren
+  '/volunteers': typeof VolunteersRouteWithChildren
+  '/missing/$id': typeof MissingIdRoute
+  '/projects/$id': typeof ProjectsIdRoute
+  '/resources/$id': typeof ResourcesIdRoute
+  '/volunteers/$id': typeof VolunteersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/missing': typeof MissingRoute
-  '/projects': typeof ProjectsRoute
-  '/resources': typeof ResourcesRoute
-  '/volunteers': typeof VolunteersRoute
+  '/missing': typeof MissingRouteWithChildren
+  '/projects': typeof ProjectsRouteWithChildren
+  '/resources': typeof ResourcesRouteWithChildren
+  '/volunteers': typeof VolunteersRouteWithChildren
+  '/missing/$id': typeof MissingIdRoute
+  '/projects/$id': typeof ProjectsIdRoute
+  '/resources/$id': typeof ResourcesIdRoute
+  '/volunteers/$id': typeof VolunteersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/missing': typeof MissingRoute
-  '/projects': typeof ProjectsRoute
-  '/resources': typeof ResourcesRoute
-  '/volunteers': typeof VolunteersRoute
+  '/missing': typeof MissingRouteWithChildren
+  '/projects': typeof ProjectsRouteWithChildren
+  '/resources': typeof ResourcesRouteWithChildren
+  '/volunteers': typeof VolunteersRouteWithChildren
+  '/missing/$id': typeof MissingIdRoute
+  '/projects/$id': typeof ProjectsIdRoute
+  '/resources/$id': typeof ResourcesIdRoute
+  '/volunteers/$id': typeof VolunteersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/missing' | '/projects' | '/resources' | '/volunteers'
+  fullPaths:
+    | '/'
+    | '/missing'
+    | '/projects'
+    | '/resources'
+    | '/volunteers'
+    | '/missing/$id'
+    | '/projects/$id'
+    | '/resources/$id'
+    | '/volunteers/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/missing' | '/projects' | '/resources' | '/volunteers'
-  id: '__root__' | '/' | '/missing' | '/projects' | '/resources' | '/volunteers'
+  to:
+    | '/'
+    | '/missing'
+    | '/projects'
+    | '/resources'
+    | '/volunteers'
+    | '/missing/$id'
+    | '/projects/$id'
+    | '/resources/$id'
+    | '/volunteers/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/missing'
+    | '/projects'
+    | '/resources'
+    | '/volunteers'
+    | '/missing/$id'
+    | '/projects/$id'
+    | '/resources/$id'
+    | '/volunteers/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MissingRoute: typeof MissingRoute
-  ProjectsRoute: typeof ProjectsRoute
-  ResourcesRoute: typeof ResourcesRoute
-  VolunteersRoute: typeof VolunteersRoute
+  MissingRoute: typeof MissingRouteWithChildren
+  ProjectsRoute: typeof ProjectsRouteWithChildren
+  ResourcesRoute: typeof ResourcesRouteWithChildren
+  VolunteersRoute: typeof VolunteersRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -116,15 +180,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volunteers/$id': {
+      id: '/volunteers/$id'
+      path: '/$id'
+      fullPath: '/volunteers/$id'
+      preLoaderRoute: typeof VolunteersIdRouteImport
+      parentRoute: typeof VolunteersRoute
+    }
+    '/resources/$id': {
+      id: '/resources/$id'
+      path: '/$id'
+      fullPath: '/resources/$id'
+      preLoaderRoute: typeof ResourcesIdRouteImport
+      parentRoute: typeof ResourcesRoute
+    }
+    '/projects/$id': {
+      id: '/projects/$id'
+      path: '/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof ProjectsIdRouteImport
+      parentRoute: typeof ProjectsRoute
+    }
+    '/missing/$id': {
+      id: '/missing/$id'
+      path: '/$id'
+      fullPath: '/missing/$id'
+      preLoaderRoute: typeof MissingIdRouteImport
+      parentRoute: typeof MissingRoute
+    }
   }
 }
 
+interface MissingRouteChildren {
+  MissingIdRoute: typeof MissingIdRoute
+}
+
+const MissingRouteChildren: MissingRouteChildren = {
+  MissingIdRoute: MissingIdRoute,
+}
+
+const MissingRouteWithChildren =
+  MissingRoute._addFileChildren(MissingRouteChildren)
+
+interface ProjectsRouteChildren {
+  ProjectsIdRoute: typeof ProjectsIdRoute
+}
+
+const ProjectsRouteChildren: ProjectsRouteChildren = {
+  ProjectsIdRoute: ProjectsIdRoute,
+}
+
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
+  ProjectsRouteChildren,
+)
+
+interface ResourcesRouteChildren {
+  ResourcesIdRoute: typeof ResourcesIdRoute
+}
+
+const ResourcesRouteChildren: ResourcesRouteChildren = {
+  ResourcesIdRoute: ResourcesIdRoute,
+}
+
+const ResourcesRouteWithChildren = ResourcesRoute._addFileChildren(
+  ResourcesRouteChildren,
+)
+
+interface VolunteersRouteChildren {
+  VolunteersIdRoute: typeof VolunteersIdRoute
+}
+
+const VolunteersRouteChildren: VolunteersRouteChildren = {
+  VolunteersIdRoute: VolunteersIdRoute,
+}
+
+const VolunteersRouteWithChildren = VolunteersRoute._addFileChildren(
+  VolunteersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MissingRoute: MissingRoute,
-  ProjectsRoute: ProjectsRoute,
-  ResourcesRoute: ResourcesRoute,
-  VolunteersRoute: VolunteersRoute,
+  MissingRoute: MissingRouteWithChildren,
+  ProjectsRoute: ProjectsRouteWithChildren,
+  ResourcesRoute: ResourcesRouteWithChildren,
+  VolunteersRoute: VolunteersRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

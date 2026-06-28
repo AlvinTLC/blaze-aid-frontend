@@ -96,3 +96,59 @@ export const venezuelaGeoQuery = queryOptions({
   staleTime: Infinity,
   gcTime: Infinity,
 })
+
+/* ------------------------------------------------------------------ */
+/* Detail queries                                                     */
+/* ------------------------------------------------------------------ */
+
+export function projectQuery(id: string) {
+  return queryOptions({
+    queryKey: ['project', id] as const,
+    queryFn: async () => {
+      const { data, error } = await apiClient.GET('/api/v1/projects/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function resourceQuery(id: string) {
+  return queryOptions({
+    queryKey: ['resource', id] as const,
+    queryFn: async () => {
+      const { data, error } = await apiClient.GET('/api/v1/resources/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function volunteerQuery(id: string) {
+  return queryOptions({
+    queryKey: ['volunteer', id] as const,
+    queryFn: async () => {
+      const { data, error } = await apiClient.GET('/api/v1/volunteers/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function missingPersonQuery(id: string) {
+  return queryOptions({
+    queryKey: ['missing', id] as const,
+    queryFn: async () => {
+      const { data, error } = await apiClient.GET('/api/v1/missing/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw error
+      return data
+    },
+  })
+}
